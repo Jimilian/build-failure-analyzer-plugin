@@ -287,14 +287,14 @@
                     <!-- Optional directory to put findbugs xdoc xml report -->
                     <!--<xmlOutputDirectory>target/site</xmlOutputDirectory>-->
                 </configuration>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>findbugs</goal>
-                        </goals>
-                        <phase>test</phase>
-                    </execution>
-                </executions>
+                <!--<executions>-->
+                    <!--<execution>-->
+                        <!--<goals>-->
+                            <!--<goal>findbugs</goal>-->
+                        <!--</goals>-->
+                        <!--<phase>test</phase>-->
+                    <!--</execution>-->
+                <!--</executions>-->
             </plugin>
         </plugins>
         <extensions>

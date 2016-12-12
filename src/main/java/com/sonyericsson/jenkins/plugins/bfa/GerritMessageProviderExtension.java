@@ -30,7 +30,6 @@ import com.sonyericsson.jenkins.plugins.bfa.model.FoundFailureCause;
 
 import hudson.Extension;
 import hudson.model.Run;
-import jenkins.model.Jenkins;
 
 import java.util.List;
 
@@ -94,7 +93,7 @@ public class GerritMessageProviderExtension extends GerritMessageProvider {
             message.append(failureCause.getDescription());
 
             message.append(" ( ")
-            .append(Jenkins.getInstance().getRootUrl())
+            .append(addSlashIsNeeded(displayData.getLinks().getJenkinsUrl()))
             .append(displayData.getLinks().getBuildUrl())
             .append(" )");
         }
@@ -105,9 +104,22 @@ public class GerritMessageProviderExtension extends GerritMessageProvider {
             }
 
             message.append("Unknown (")
-                    .append(Jenkins.getInstance().getRootUrl())
+                    .append(addSlashIsNeeded(displayData.getLinks().getJenkinsUrl()))
                     .append(displayData.getLinks().getBuildUrl())
                     .append(")");
         }
+    }
+
+    /**
+     * Add slash if it's needed
+     *
+     * @param jenkinsUrl url
+     * @return jenkinsUrl with slash
+     */
+    private String addSlashIsNeeded(String jenkinsUrl) {
+        if (!jenkinsUrl.endsWith("/")) {
+            jenkinsUrl += "/";
+        }
+        return jenkinsUrl;
     }
 }

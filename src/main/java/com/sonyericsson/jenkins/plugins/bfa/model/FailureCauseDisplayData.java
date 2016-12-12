@@ -24,6 +24,8 @@ package com.sonyericsson.jenkins.plugins.bfa.model;
  */
 
 import hudson.model.Run;
+import jenkins.model.Jenkins;
+import org.kohsuke.stapler.export.Exported;
 import org.kohsuke.stapler.export.ExportedBean;
 
 import java.util.LinkedList;
@@ -60,7 +62,8 @@ public class FailureCauseDisplayData {
         links = new Links(build.getParent().getUrl(),
                 build.getParent().getDisplayName(),
                 build.getUrl(),
-                build.getDisplayName());
+                build.getDisplayName(),
+                Jenkins.getInstance().getRootUrl());
     }
 
     /**
@@ -72,11 +75,30 @@ public class FailureCauseDisplayData {
      * @param buildName name of the build.
      *
      */
+    @Deprecated
     public FailureCauseDisplayData(final String parentUrl,
                                    final String parentName,
                                    final String buildUrl,
                                    final String buildName) {
-        links = new Links(parentUrl, parentName, buildUrl, buildName);
+        links = new Links(parentUrl, parentName, buildUrl, buildName, Jenkins.getInstance().getRootUrl());
+    }
+
+    /**
+     * Use this constructor when the build is known.
+     *
+     * @param parentUrl url of the parent job.
+     * @param parentName name of the parent job.
+     * @param buildUrl url of the build.
+     * @param buildName name of the build.
+     * @param jenkinsUrl url of Jenkins master (could be different in multi-master scheme).
+     *
+     */
+    public FailureCauseDisplayData(final String parentUrl,
+                                   final String parentName,
+                                   final String buildUrl,
+                                   final String buildName,
+                                   final String jenkinsUrl) {
+        links = new Links(parentUrl, parentName, buildUrl, buildName, jenkinsUrl);
     }
 
     /**
@@ -94,6 +116,7 @@ public class FailureCauseDisplayData {
      *
      * @return a list of FoundFailureCauses
      */
+    @Exported
     public final List<FoundFailureCause> getFoundFailureCauses() {
         return foundFailureCauses;
     }
@@ -114,6 +137,7 @@ public class FailureCauseDisplayData {
      *
      * @return a list of all downstream display data
      */
+    @Exported
     public final List<FailureCauseDisplayData> getDownstreamFailureCauses() {
         return downstreamFailureCauses;
     }
@@ -123,6 +147,7 @@ public class FailureCauseDisplayData {
      *
      * @return an object containing link info
      */
+    @Exported
     public final Links getLinks() {
         return links;
     }
@@ -130,12 +155,14 @@ public class FailureCauseDisplayData {
     /**
      * A class containing links to be displayed for the project and the build.
      */
+    @ExportedBean
     public static final class Links {
 
         private String projectUrl;
         private String buildUrl;
         private String projectDisplayName;
         private String buildDisplayName;
+        private String jenkinsUrl;
 
         /**
          * Constructor evaluating links.
@@ -146,15 +173,18 @@ public class FailureCauseDisplayData {
          * @param parentName name of the parent job.
          * @param buildUrl url of the build.
          * @param buildName name of the build.
+         * @param jenkinsUrl url of Jenkins there job was executed.
          */
         private Links(final String parentUrl,
                       final String parentName,
                       final String buildUrl,
-                      final String buildName) {
+                      final String buildName,
+                      final String jenkinsUrl) {
             this.projectUrl = parentUrl;
             this.buildUrl = buildUrl;
             this.projectDisplayName = parentName;
             this.buildDisplayName = buildName;
+            this.jenkinsUrl = jenkinsUrl;
         }
 
         /**
@@ -162,6 +192,7 @@ public class FailureCauseDisplayData {
          *
          * @return link to the project.
          */
+        @Exported
         public String getProjectUrl() {
             return projectUrl;
         }
@@ -180,6 +211,7 @@ public class FailureCauseDisplayData {
          *
          * @return link to build
          */
+        @Exported
         public String getBuildUrl() {
             return buildUrl;
         }
@@ -198,6 +230,7 @@ public class FailureCauseDisplayData {
          *
          * @return text to show for the project link
          */
+        @Exported
         public String getProjectDisplayName() {
             return projectDisplayName;
         }
@@ -216,6 +249,7 @@ public class FailureCauseDisplayData {
          *
          * @return text to show for the build link
          */
+        @Exported
         public String getBuildDisplayName() {
             return buildDisplayName;
         }
@@ -227,6 +261,16 @@ public class FailureCauseDisplayData {
          */
         public void setBuildDisplayName(final String buildDisplayName) {
             this.buildDisplayName = buildDisplayName;
+        }
+
+        /**
+         * Getting the Jenkins master url.
+         *
+         * @return link to the Jenkins master
+         */
+        @Exported
+        public String getJenkinsUrl() {
+            return jenkinsUrl;
         }
     }
 
