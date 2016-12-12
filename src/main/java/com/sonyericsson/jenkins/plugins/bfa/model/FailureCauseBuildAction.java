@@ -62,6 +62,8 @@ public class FailureCauseBuildAction implements BuildBadgeAction {
 
     private Run build;
 
+    private FailureCauseDisplayData failureCauseDisplayData;
+
     /**
      * Standard constructor.
      *
@@ -200,25 +202,47 @@ public class FailureCauseBuildAction implements BuildBadgeAction {
     }
 
     /**
+     *
+     * Forcibly sets failureCauseDisplayData.
+     *
+     * @param failureCauseDisplayData - the data that would be displayed to the user
+     */
+    public void setFailureCauseDisplayData(FailureCauseDisplayData failureCauseDisplayData) {
+        this.failureCauseDisplayData = failureCauseDisplayData;
+    }
+
+    /**
      * Getter for the FailureCauseDisplayData.
      *
      * @return the FailureCauseDisplayData.
      */
     @Exported
     public FailureCauseDisplayData getFailureCauseDisplayData() {
-        FailureCauseDisplayData failureCauseDisplayData
-                = getDownstreamData(this, 0);
-
-        // Fallback, if no build is stored in in build action,
         if (failureCauseDisplayData == null) {
-            failureCauseDisplayData = new FailureCauseDisplayData();
-            failureCauseDisplayData.setFoundFailureCauses(
-                    this.getFoundFailureCauses());
+            FailureCauseDisplayData displayData
+                    = getDownstreamData(this, 0);
+
+            // Fallback, if no build is stored in build action,
+            if (displayData == null) {
+                displayData = new FailureCauseDisplayData();
+                displayData.setFoundFailureCauses(
+                        this.getFoundFailureCauses());
+            }
+
+            failureCauseDisplayData = displayData;
         }
 
         return failureCauseDisplayData;
     }
 
+    /**
+     * Getter for the FailureCauseDisplayData. Without recursion. Just check variable.
+     *
+     * @return the FailureCauseDisplayData
+     */
+    private FailureCauseDisplayData getFailureCauseDisplayDataWithoutRecursion() {
+        return failureCauseDisplayData;
+    }
 
     /**
      * Populates the supplied FailureCauseDisplayData with FailureCause from the
@@ -232,6 +256,10 @@ public class FailureCauseBuildAction implements BuildBadgeAction {
     private static FailureCauseDisplayData getDownstreamData(
             final FailureCauseBuildAction buildAction, final int depth) {
 
+        if (buildAction.getFailureCauseDisplayDataWithoutRecursion() != null) {
+            return buildAction.getFailureCauseDisplayData();
+        }
+
         final int maxDepth = 10;
 
         FailureCauseDisplayData displayData = null;
@@ -241,7 +269,7 @@ public class FailureCauseBuildAction implements BuildBadgeAction {
             displayData = new FailureCauseDisplayData(build.getParent().getUrl(),
                     build.getParent().getDisplayName(),
                     build.getUrl(),
-                    build.getDisplayName());
+                    build.getDisplayName(), Jenkins.getInstance().getRootUrl());
 
             // Add causes from this build
             displayData.setFoundFailureCauses(
@@ -252,6 +280,8 @@ public class FailureCauseBuildAction implements BuildBadgeAction {
                 checkSubFailureCauseBuildAction(
                         run, displayData, depth);
             }
+
+            buildAction.setFailureCauseDisplayData(displayData);
         }
         return displayData;
     }
