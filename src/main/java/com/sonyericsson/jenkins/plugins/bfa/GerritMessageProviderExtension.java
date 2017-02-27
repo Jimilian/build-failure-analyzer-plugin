@@ -93,7 +93,7 @@ public class GerritMessageProviderExtension extends GerritMessageProvider {
             message.append(failureCause.getDescription());
 
             message.append(" ( ")
-            .append(addSlashIsNeeded(displayData.getLinks().getJenkinsUrl()))
+            .append(displayData.getLinks().getJenkinsUrl())
             .append(displayData.getLinks().getBuildUrl())
             .append(" )");
         }
@@ -104,22 +104,9 @@ public class GerritMessageProviderExtension extends GerritMessageProvider {
             }
 
             message.append("Unknown (")
-                    .append(addSlashIsNeeded(displayData.getLinks().getJenkinsUrl()))
+                    .append(displayData.getLinks().getJenkinsUrl())
                     .append(displayData.getLinks().getBuildUrl())
                     .append(")");
         }
-    }
-
-    /**
-     * Add slash if it's needed
-     *
-     * @param jenkinsUrl url
-     * @return jenkinsUrl with slash
-     */
-    private String addSlashIsNeeded(String jenkinsUrl) {
-        if (!jenkinsUrl.endsWith("/")) {
-            jenkinsUrl += "/";
-        }
-        return jenkinsUrl;
     }
 }
